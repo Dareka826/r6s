@@ -1,0 +1,106 @@
+#!/bin/sh
+set -eu
+
+dump_vars() {
+    printf "USER: %s\n" "${USER}"
+    printf "USER_UID: %s\n" "${USER_UID}"
+
+    printf "S6_SERVICE_DIR: %s\n" "${S6_SERVICE_DIR}"
+
+    printf "S6_RC_SV_DIR: %s\n" "${S6_RC_SV_DIR}"
+    printf "S6_RC_DB_DIR: %s\n" "${S6_RC_DB_DIR}"
+    printf "S6_RC_ENV_DIR: %s\n" "${S6_RC_ENV_DIR}"
+    printf "S6_RC_LIVE_DIR: %s\n" "${S6_RC_LIVE_DIR}"
+}
+
+## s6 {{{
+
+# Run svscan on service dir
+s6_init() {
+    # Ensure service dir
+    install -d -o "${USER}" -g "${USER}" -m 750 "${S6_SERVICE_DIR}"
+
+    exec s6-envdir -I "${S6_RC_ENV_DIR}" \
+        s6-svscan "${S6_SERVICE_DIR}"
+}
+
+## }}}
+
+## s6-rc {{{
+
+# Initialize s6-rc state
+s6rc_init() {
+    s6-rc-init -c "${S6_RC_BD_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
+}
+
+# Compile service dir to db
+s6rc_compile_db() {
+    local COMPILED_DB="${S6_RC_DB_DIR}/compiled-$(s6-clock)"
+    s6-rc-compile -v2 "${COMPILED_DB}" "${S6_RC_SV_DIR}"
+}
+
+# Fetch name of newest db
+s6rc_newest_db() {
+    find "${S6_RC_DB_DIR}" -maxdepth 1 -type d -name compiled\* \
+        | sort | tail -1
+}
+
+# Update live db to the newest one
+s6rc_update_live_db() {
+    local NEW_DB="$(s6rc_newest_db)"
+    s6-rc-update -v2 -l "${S6_RC_LIVE_DIR}" "${NEW_DB}"
+
+    # Atomic symlink update
+    ln -sf "${NEW_DB##*/}" "${S6_RC_DB_DIR}/compiled/compiled"
+    mv -f "${S6_RC_DB_DIR}/compiled/compiled" "${S6_RC_DB_DIR}/"
+}
+
+## }}}
+
+
+# Default parameters
+USER="root"
+
+# Parse option args
+while true; do
+    case "$1" in
+        "-u") USER="$2"; shift 2;;
+           *) break ;;
+    esac
+done
+
+# Variables
+USER_UID="$(s6-envuidgid "${USER}" sh -c 'printf "%s\n" "${UID}"')"
+
+if [ "${USER_UID}" = "0" ]; then
+    # Root user, global s6
+    S6_SERVICE_DIR="/var/service"
+
+    # TODO: Multile SV dirs (like on Artix)
+    S6_RC_SV_DIR="/etc/s6/sv"
+    S6_RC_DB_DIR="/etc/s6/rc/compiled"
+    S6_RC_LIVE_DIR="/run/s6-rc"
+else
+    # User-local s6
+    S6_SERVICE_DIR="/tmp/s6-service-${USER_UID}"
+
+    S6_RC_SV_DIR="/home/${USER}/.local/share/s6/sv"
+    S6_RC_DB_DIR="/home/${USER}/.local/share/s6/rc"
+    S6_RC_ENV_DIR="/home/${USER}/.local/share/s6/env.d"
+    S6_RC_LIVE_DIR="/tmp/s6-rc-${USER_UID}"
+
+    XDG_RUNTIME_DIR="/run/user/${USER_UID}"
+    DBUS_SESSION_BUS_ADDRESS="unix:abstract=/${USER_UID}/dbus"
+fi
+
+# Parse command args
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+               "init_s6") s6_init ; shift 1 ;;
+            "init_s6-rc") s6rc_init ; shift 1 ;;
+            "compile_db") s6rc_compile_db ; shift 1 ;;
+        "update_live_db") s6rc_update_live_db ; shift 1 ;;
+             "dump_vars") dump_vars ; shift 1 ;;
+                       *) exit 0 ;;
+    esac
+done
