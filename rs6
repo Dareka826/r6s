@@ -1,6 +1,18 @@
 #!/bin/sh
 set -eu
 
+iscmd() { command -v "${1}" >/dev/null 2>&1; }
+
+# Ensure commands
+ALL_CMD_FOUND="1"
+for CMD in s6-svscan s6-rc s6-rc-init s6-rc-compile abduco; do
+    iscmd "${CMD}" || {
+        ALL_CMD_FOUND="0"
+        printf "Command not found: %s\n" "${CMD}"
+    }
+done
+[ "${ALL_CMD_FOUND}" = "1" ] || exit 1
+
 dump_vars() {
     printf "USER: %s\n" "${USER}"
     printf "USER_UID: %s\n" "${USER_UID}"
