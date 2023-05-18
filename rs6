@@ -30,8 +30,10 @@ s6_init() {
     # Ensure service dir
     install -d -o "${USER}" -g "${USER}" -m 750 "${S6_SERVICE_DIR}"
 
-    exec s6-envdir -I "${S6_RC_ENV_DIR}" \
-        s6-svscan "${S6_SERVICE_DIR}"
+    abduco | grep s6-svscan >/dev/null 2>&1 || \
+        abduco -n s6-svscan \
+            s6-envdir -I "${S6_RC_ENV_DIR}" \
+                s6-svscan "${S6_SERVICE_DIR}"
 }
 
 # Initialize s6-rc state
