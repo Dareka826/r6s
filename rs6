@@ -62,9 +62,9 @@ iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
 # Print command if dry run, execute otherwise
 execcmd() {
     if [ "${DRY_RUN}" = "1" ]; then
-        printf "%s\n" "$*"
+        printf "%s\n" "${*}"
     else
-        "$@"
+        "${@}"
     fi
 }
 ## }}}
@@ -288,7 +288,7 @@ cmd_compile_db() {
     [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
     [ -n "${*}" ] || { usage; exit 1; }
 
-    s6rc_compile_db "${OPT_D}" "$@"
+    s6rc_compile_db "${OPT_D}" "${@}"
 }
 
 cmd_switch_live_db() {
@@ -401,7 +401,7 @@ done
 CMDNAME="${1}"
 if iscmd "cmd_${CMDNAME}"; then
     shift 1
-    "cmd_${CMDNAME}" "$@"
+    "cmd_${CMDNAME}" "${@}"
 else
     usage
     exit 1
