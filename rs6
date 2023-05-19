@@ -99,7 +99,7 @@ if [ "${_UID}" = "0" ]; then
     S6_SERVICE_DIR="/run/service"
     S6_RC_LIVE_DIR="/run/s6-rc"
 
-    # TODO: Multile SV dirs (like on Artix)
+    # TODO: Handle multiple SV dirs (like on Artix)
     S6_RC_SV_DIR="/etc/s6/sv"
     S6_RC_DB_DIR="/etc/s6/rc"
     S6_RC_ENV_DIR=""
