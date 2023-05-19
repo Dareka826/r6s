@@ -78,17 +78,16 @@ s6rc_compile_db() {
         "${DB_DIR}/compiled-$("${S6_CLOCK_BIN}")" "${@}"
 }
 
-# Fetch name of newest db
-s6rc_newest_db() {
-    find "${S6_RC_DB_DIR}" -maxdepth 1 -type d -name compiled\* \
-        | sort | tail -1
+# Switch which db s6-rc is using
+s6rc_switch_live_db() {
+    local LIVE_DIR="${1}"
+    local NEW_DB="${2}"
+    shift 2
+
+    execcmd "${S6_RC_UPDATE_BIN}" -v2 -l "${LIVE_DIR}" "${NEW_DB}"
 }
 
-# Update live db to the newest one
-s6rc_update_live_db() {
-    local NEW_DB="$(s6rc_newest_db)"
-    execcmd "${S6_RC_UPDATE_BIN}" -v2 -l "${S6_RC_LIVE_DIR}" "${NEW_DB}"
-
+s6_rc_update_db() {
     # Atomic symlink update
     execcmd ln -sf "${NEW_DB##*/}" "${S6_RC_DB_DIR}/compiled/compiled"
     execcmd mv -f "${S6_RC_DB_DIR}/compiled/compiled" "${S6_RC_DB_DIR}/"
@@ -188,7 +187,10 @@ cmd_compile_db() {
 }
 
 cmd_switch_live_db() {
-    exit 1
+    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
+
+    s6rc_switch_live_db "${OPT_L}" "${1}"
 }
 
 cmd_update_db() {
