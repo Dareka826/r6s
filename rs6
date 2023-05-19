@@ -15,6 +15,8 @@ usage() {
     printf "    sv list down                     List inactive services\n"
     printf "    sv restart SERVICE               Restart a service\n"
     printf "    rc AGRS...                       Run s6-rc with provided args\n"
+    printf "    env add VAR VALUE                Add variable to envdir\n"
+    printf "    env del VAR                      Remove variable from envdir\n"
     printf "\n"
     printf "  options:\n"
     printf "    -n        Dry run (print commands instead of executing them)\n"
@@ -46,6 +48,9 @@ usage() {
     printf "\n"
     printf "    rc:\n"
     printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+    printf "    env:\n"
+    printf "      -e ENV_DIR            envdir to change\n"
     printf "\n"
 }
 ## }}}
@@ -186,6 +191,33 @@ s6rc_passthrough() {
 
     execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" "${@}"
 }
+
+s6_env_add() {
+    local ENV_DIR="${1}"
+    local VAR="${2}"
+    local VAL="${3}"
+    shift 3
+
+    [ -d "${ENV_DIR}" ] || \
+        { printf "[E]: Environment directory doesn't exist!: %s\n" "${ENV_DIR}"; exit 1; }
+
+    if [ "${DRY_RUN}" = "0" ]; then
+        printf "%s\n" "${VAL}" >"${ENV_DIR}/${VAR}"
+    else
+        printf "%s\n" "printf \"%s\n\" \"${VAL}\" >\"${ENV_DIR}/${VAR}\""
+    fi
+}
+
+s6_env_del() {
+    local ENV_DIR="${1}"
+    local VAR="${2}"
+    shift 2
+
+    [ -d "${ENV_DIR}" ] || \
+        { printf "[E]: Environment directory doesn't exist!: %s\n" "${ENV_DIR}"; exit 1; }
+
+    execcmd rm "${ENV_DIR}/${VAR}"
+}
 ## }}}
 
 ## Variables {{{
@@ -299,6 +331,21 @@ cmd_rc() {
     [ "${#}" -ge 1 ] || { usage; exit 1; }
 
     s6rc_passthrough "${OPT_L}" "${@}"
+}
+
+cmd_env() {
+    [ -n "${OPT_E}" ] || OPT_E="$(var_gen_s6_env_dir)"
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
+
+    if [ "${1}" = "add" ]; then
+        [ "${#}" -ge 3 ] || { usage; exit 1; }
+
+        s6_env_add "${OPT_E}" "${2}" "${3}"
+    elif [ "${1}" = "del" ]; then
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+
+        s6_env_del "${OPT_E}" "${2}"
+    fi
 }
 
 ## }}}
