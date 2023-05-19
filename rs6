@@ -219,8 +219,10 @@ done
 [ "${#}" -gt 0 ] || { usage; exit 1; }
 
 # Decide what to do
-if iscmd "cmd_${1}"; then
-    "cmd_${1}" "$@"
+CMDNAME="${1}"
+if iscmd "cmd_${CMDNAME}"; then
+    shift 1
+    "cmd_${CMDNAME}" "$@"
 else
     usage
     exit 1
