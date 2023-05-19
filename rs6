@@ -87,6 +87,7 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
        ABDUCO_BIN="$(cmdpath "abduco")"
 ## }}}
 
+## s6/s6-rc functions {{{
 # Run svscan on service dir
 s6_init() {
     local SVC_DIR="${1}"
@@ -185,6 +186,7 @@ s6rc_passthrough() {
 
     execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" "${@}"
 }
+## }}}
 
 ## Variables {{{
 _USER="$(id -u -n)"
