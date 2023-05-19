@@ -18,7 +18,7 @@ execcmd() {
 ## Preparation {{{
 # Ensure commands
 ALL_CMD_FOUND="1"
-for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock s6-rc abduco; do
+for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock s6-rc s6-svc abduco; do
     iscmd "${CMD}" || {
         ALL_CMD_FOUND="0"
         printf "Command not found: %s\n" "${CMD}"
@@ -34,6 +34,7 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
  S6_RC_UPDATE_BIN="$(cmdpath "s6-rc-update")"
      S6_CLOCK_BIN="$(cmdpath "s6-clock")"
         S6_RC_BIN="$(cmdpath "s6-rc")"
+       S6_SVC_BIN="$(cmdpath "s6-svc")"
        ABDUCO_BIN="$(cmdpath "abduco")"
 ## }}}
 
@@ -126,7 +127,7 @@ s6_restart_service() {
     [ -d "${SVC_DIR}/${SVC_NAME}" ] || \
         { printf "[E]: %s: No such service in %s!\n" "${SVC_NAME}" "${SVC_DIR}"; exit 1; }
 
-    execcmd s6-svc -r "${SVC_DIR}/${SVC_NAME}"
+    execcmd "${S6_SVC_BIN}" -r "${SVC_DIR}/${SVC_NAME}"
 }
 
 usage() {
