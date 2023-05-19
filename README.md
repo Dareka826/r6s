@@ -17,5 +17,7 @@ rs6 [options] command
     init_s6-rc        Initializes s6-rc state
     compile_db        Compiles a new db from the service definitions
     update_live_db    Updates the db that s6-rc is using to the newest one
+    svc_list_up       List active services
+    svc_list_down     List inactive services
 
 ```
