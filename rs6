@@ -266,8 +266,8 @@ var_gen_s6_logfile() {
 ## Commands {{{
 
 cmd_init() {
-    [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
     [ "${#}" -ge 1 ] || { usage; exit 1; }
+    [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
 
     if [ "${1}" = "s6" ]; then
         [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_logfile)"
@@ -285,22 +285,22 @@ cmd_init() {
 }
 
 cmd_compile_db() {
-    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
     [ -n "${*}" ] || { usage; exit 1; }
+    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
 
     s6rc_compile_db "${OPT_D}" "${@}"
 }
 
 cmd_switch_live_db() {
-    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
     [ "${#}" -ge 1 ] || { usage; exit 1; }
+    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
 
     s6rc_switch_live_db "${OPT_L}" "${1}"
 }
 
 cmd_change_default_db() {
-    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
     [ "${#}" -ge 1 ] || { usage; exit 1; }
+    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
 
     s6rc_change_default_db "${OPT_D}" "${1}"
 }
@@ -309,8 +309,8 @@ cmd_sv() {
     [ "${#}" -ge 1 ] || { usage; exit 1; }
 
     if [ "${1}" = "list" ]; then
-        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
         [ "${#}" -ge 2 ] || { usage; exit 1; }
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
 
         if [ "${2}" = "up" ]; then
             s6rc_list_up "${OPT_L}"
@@ -319,23 +319,23 @@ cmd_sv() {
         fi
 
     elif [ "${1}" = "restart" ]; then
-        [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
         [ "${#}" -ge 2 ] || { usage; exit 1; }
+        [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
 
         s6_restart_service "${OPT_S}" "${2}"
     fi
 }
 
 cmd_rc() {
-    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
     [ "${#}" -ge 1 ] || { usage; exit 1; }
+    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
 
     s6rc_passthrough "${OPT_L}" "${@}"
 }
 
 cmd_env() {
-    [ -n "${OPT_E}" ] || OPT_E="$(var_gen_s6_env_dir)"
     [ "${#}" -ge 1 ] || { usage; exit 1; }
+    [ -n "${OPT_E}" ] || OPT_E="$(var_gen_s6_env_dir)"
 
     if [ "${1}" = "add" ]; then
         [ "${#}" -ge 3 ] || { usage; exit 1; }
