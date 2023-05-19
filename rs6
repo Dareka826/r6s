@@ -129,29 +129,76 @@ else
 fi
 ## }}}
 
+## Commands {{{
+
+cmd_init() {
+}
+
+cmd_compile_db() {
+}
+
+cmd_switch_live_db() {
+}
+
+cmd_update_db() {
+}
+
+cmd_sv() {
+}
+
+cmd_rc() {
+}
+
+## }}}
+
 ## MAIN {{{
-# Default parameters
+
+# Check if any args present
+[ "${#}" -gt 0 ] || { usage; exit 0; }
+
+# Default options
 DRY_RUN="0"
+OPT_D=""
+OPT_L=""
+OPT_S=""
 
 # Parse option args
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
-        "-n") DRY_RUN="1"; shift 1 ;;
+
+        "-n") DRY_RUN="1"
+              shift 1
+              ;;
+
+        "-d") [ "${#}" -ge 2 ] || exit 1
+              OPT_D="${2}"
+              shift 2
+              ;;
+
+        "-l") [ "${#}" -ge 2 ] || exit 1
+              OPT_L="${2}"
+              shift 2
+              ;;
+
+        "-s") [ "${#}" -ge 2 ] || exit 1
+              OPT_S="${2}"
+              shift 2
+              ;;
+
            *) break ;;
     esac
 done
 
-# Parse command args
-[ "${#}" -gt 0 ] || { usage; exit 0; }
-while [ "${#}" -gt 0 ]; do
-    case "${1}" in
-               "init_s6") s6_init ; shift 1 ;;
-            "init_s6-rc") s6rc_init ; shift 1 ;;
-            "compile_db") s6rc_compile_db ; shift 1 ;;
-        "update_live_db") s6rc_update_live_db ; shift 1 ;;
-           "svc_list_up") s6rc_list_up ; shift 1 ;;
-         "svc_list_down") s6rc_list_down ; shift 1 ;;
-                       *) usage ; exit 0 ;;
-    esac
-done
+
+# Check if any command specified
+[ "${#}" -gt 0 ] || { usage; exit 1; }
+
+# Decide what to do
+if iscmd "cmd_${1}"; then
+    "cmd_${1}" "$@"
+else
+    usage
+    exit 1
+fi
+
 ## }}}
