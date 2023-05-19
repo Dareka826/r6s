@@ -39,14 +39,20 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
 
 # Run svscan on service dir
 s6_init() {
+    local SVC_DIR="${1}"
+    local LOGFILE="${2}"
+    local ENV_DIR="${3}"
+
     # Ensure service dir
-    execcmd install -d -o "${USER}" -g "${USER}" -m 750 "${S6_SERVICE_DIR}"
+    execcmd install -d -o "${USER}" -g "${USER}" -m 750 "${SVC_DIR}"
 
     # Run s6-svscan in abduco if not already running
     if ! { "${ABDUCO_BIN}" | tail +2 | sed 's/.*\t//' | grep "^s6-svscan$" >/dev/null 2>&1; }; then
         execcmd "${ABDUCO_BIN}" -n s6-svscan \
-            "${S6_ENVDIR_BIN}" -I "${S6_RC_ENV_DIR}" \
-                "${S6_SVSCAN_BIN}" "${S6_SERVICE_DIR}"
+            sh -c '"${1}" -I "${2}"  "${3}" "${4}" 2>&1 | tee "${5}"' '' \
+            "${S6_ENVDIR_BIN}" "${ENV_DIR}" \
+            "${S6_SVSCAN_BIN}" "${SVC_DIR}" \
+            "${LOGFILE}"
     fi
 }
 
@@ -146,7 +152,20 @@ var_gen_s6_logfile() {
 ## Commands {{{
 
 cmd_init() {
-    exit 1
+    [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
+
+    if [ "${1}" = "s6" ]; then
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_logfile)"
+        [ -n "${OPT_E}" ] || OPT_E="$(var_gen_s6_env_dir)"
+
+        s6_init "${OPT_S}" "${OPT_L}" "${OPT_E}"
+    elif [ "${1}" = "s6-rc" ]; then
+        # TODO
+
+        exit 1
+    else
+        exit 1
+    fi
 }
 
 cmd_compile_db() {
