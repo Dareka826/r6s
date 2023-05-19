@@ -6,3 +6,15 @@ using this tool in case problems occur.
 
 # Usage
 
+```
+rs6 [options] command
+
+  options:
+    -n    dry run
+
+  commands:
+    init_s6
+    init_s6-rc
+    compile_db
+    update_live_db
+```
