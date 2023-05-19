@@ -10,5 +10,6 @@ rs6 [ -n ] [ -d db_dir ] change_default_db COMPILED_NEW_DB
 
 rs6 [ -n ] [ -l livedir ] sv list up
 rs6 [ -n ] [ -l livedir ] sv list down
+rs6 [ -n ] [ -s servicedir ] sv restart SERVICE
 
 rs6 [ -n ] [ -l livedir ] rc [rc opts]

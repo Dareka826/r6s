@@ -105,11 +105,28 @@ s6rc_change_default_db() {
 }
 
 s6rc_list_up() {
-    "${S6_RC_BIN}" -l "${S6_RC_LIVE_DIR}" -a list
+    local LIVE_DIR="${1}"
+    shift 1
+
+    execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" -a list
 }
 
 s6rc_list_down() {
-    "${S6_RC_BIN}" -l "${S6_RC_LIVE_DIR}" -ad list
+    local LIVE_DIR="${1}"
+    shift 1
+
+    execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" -ad list
+}
+
+s6_restart_service() {
+    local SVC_DIR="${1}"
+    local SVC_NAME="${2}"
+    shift 2
+
+    [ -d "${SVC_DIR}/${SVC_NAME}" ] || \
+        { printf "[E]: %s: No such service in %s!\n" "${SVC_NAME}" "${SVC_DIR}"; exit 1; }
+
+    execcmd s6-svc -r "${SVC_DIR}/${SVC_NAME}"
 }
 
 usage() {
@@ -212,7 +229,24 @@ cmd_change_default_db() {
 }
 
 cmd_sv() {
-    exit 1
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
+
+    if [ "${1}" = "list" ]; then
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+
+        if [ "${2}" = "up" ]; then
+            s6rc_list_up "${OPT_L}"
+        elif [ "${2}" = "down" ]; then
+            s6rc_list_down "${OPT_L}"
+        fi
+
+    elif [ "${1}" = "restart" ]; then
+        [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+
+        s6_restart_service "${OPT_S}" "${2}"
+    fi
 }
 
 cmd_rc() {
