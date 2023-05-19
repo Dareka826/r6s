@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
+## Utilities {{{
 cmdpath() { command -v "${1}"; }
 iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
 
@@ -12,7 +13,9 @@ execcmd() {
         "$@"
     fi
 }
+## }}}
 
+## Preparation {{{
 # Ensure commands
 ALL_CMD_FOUND="1"
 for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock abduco; do
@@ -31,6 +34,7 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
  S6_RC_UPDATE_BIN="$(cmdpath "s6-rc-update")"
      S6_CLOCK_BIN="$(cmdpath "s6-clock")"
        ABDUCO_BIN="$(cmdpath "abduco")"
+## }}}
 
 # Run svscan on service dir
 s6_init() {
@@ -83,7 +87,7 @@ usage() {
     printf "    update_live_db\n"
 }
 
-# Variables
+## Variables {{{
 _USER="$(id -u -n)"
  _UID="$(id -u)"
 _HOME="$(homeof "${_USER}")"
@@ -109,7 +113,9 @@ else
     XDG_RUNTIME_DIR="/run/user/${_UID}"
     DBUS_SESSION_BUS_ADDRESS="unix:abstract=/${_UID}/dbus"
 fi
+## }}}
 
+## MAIN {{{
 # Default parameters
 DRY_RUN="0"
 
@@ -132,3 +138,4 @@ while [ "$#" -gt 0 ]; do
                        *) usage ; exit 0 ;;
     esac
 done
+## }}}
