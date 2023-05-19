@@ -60,7 +60,11 @@ s6_init() {
 
 # Initialize s6-rc state
 s6rc_init() {
-    execcmd "${S6_RC_INIT_BIN}" -c "${S6_RC_DB_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
+    local SVC_DIR="${1}"
+    local LIVE_DIR="${2}"
+    local COMPILED_DB="${3}"
+
+    execcmd "${S6_RC_INIT_BIN}" -c "${COMPILED_DB}" -l "${LIVE_DIR}" "${SVC_DIR}"
 }
 
 # Compile service dir to db
@@ -162,9 +166,10 @@ cmd_init() {
 
         s6_init "${OPT_S}" "${OPT_L}" "${OPT_E}"
     elif [ "${1}" = "s6-rc" ]; then
-        # TODO
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+        [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)/compiled"
 
-        exit 1
+        s6rc_init "${OPT_S}" "${OPT_L}" "${OPT_D}"
     else
         exit 1
     fi
