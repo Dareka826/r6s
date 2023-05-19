@@ -105,13 +105,13 @@ s6_init() {
 
     # Run s6-svscan in abduco if not already running
     if ! { "${ABDUCO_BIN}" | tail +2 | sed 's/.*\t//' | grep "^s6-svscan$" >/dev/null 2>&1; }; then
-        execcmd "${ABDUCO_BIN}" -n s6-svscan \
-            sh -c '"${1}" -I "${2}"  "${3}" "${4}" 2>&1 | tee "${5}"' '' \
+        execcmd "${ABDUCO_BIN}" -n "s6-svscan" \
+            sh -c '"${1}" -I "${2}" "${3}" "${4}" 2>&1 | tee "${5}"' '' \
             "${S6_ENVDIR_BIN}" "${ENV_DIR}" \
             "${S6_SVSCAN_BIN}" "${SVC_DIR}" \
             "${LOGFILE}"
     else
-        printf "[I]: s6-svscan already running!\n"
+        printf "[I]: s6-svscan is already running!\n"
     fi
 }
 
@@ -403,6 +403,7 @@ if iscmd "cmd_${CMDNAME}"; then
     shift 1
     "cmd_${CMDNAME}" "${@}"
 else
+    printf "[E]: No such command: %s\n" "${CMDNAME}"
     usage
     exit 1
 fi
