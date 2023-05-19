@@ -104,6 +104,7 @@ usage() {
 _USER="$(id -u -n)"
  _UID="$(id -u)"
 _HOME="$(homeof "${_USER}")"
+_TMPDIR="${TMPDIR:-/tmp}"
 
 if [ "${_UID}" = "0" ]; then
     # Root user, global s6 installation
@@ -116,8 +117,8 @@ if [ "${_UID}" = "0" ]; then
     S6_RC_ENV_DIR=""
 else
     # User-local s6
-    S6_SERVICE_DIR="/tmp/s6-service-${_UID}"
-    S6_RC_LIVE_DIR="/tmp/s6-rc-${_UID}"
+    S6_SERVICE_DIR="${_TMPDIR}/s6-service-${_UID}"
+    S6_RC_LIVE_DIR="${_TMPDIR}/s6-rc-${_UID}"
 
      S6_RC_SV_DIR="${_HOME}/.local/share/s6/sv"
      S6_RC_DB_DIR="${_HOME}/.local/share/s6/rc"
