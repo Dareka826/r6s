@@ -53,6 +53,8 @@ s6_init() {
             "${S6_ENVDIR_BIN}" "${ENV_DIR}" \
             "${S6_SVSCAN_BIN}" "${SVC_DIR}" \
             "${LOGFILE}"
+    else
+        printf "[I]: s6-svscan already running!\n"
     fi
 }
 
