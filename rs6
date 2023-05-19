@@ -42,6 +42,7 @@ s6_init() {
     local SVC_DIR="${1}"
     local LOGFILE="${2}"
     local ENV_DIR="${3}"
+    shift 3
 
     # Ensure service dir
     execcmd install -d -o "${USER}" -g "${USER}" -m 750 "${SVC_DIR}"
@@ -63,6 +64,7 @@ s6rc_init() {
     local SVC_DIR="${1}"
     local LIVE_DIR="${2}"
     local COMPILED_DB="${3}"
+    shift 3
 
     execcmd "${S6_RC_INIT_BIN}" -c "${COMPILED_DB}" -l "${LIVE_DIR}" "${SVC_DIR}"
 }
