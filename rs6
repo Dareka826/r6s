@@ -49,7 +49,7 @@ s6_init() {
 
 # Initialize s6-rc state
 s6rc_init() {
-    "${S6_RC_INIT_BIN}" -c "${S6_RC_BD_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
+    "${S6_RC_INIT_BIN}" -c "${S6_RC_DB_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
 }
 
 # Compile service dir to db
