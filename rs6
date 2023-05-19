@@ -280,6 +280,7 @@ cmd_init() {
 
         s6rc_init "${OPT_S}" "${OPT_L}" "${OPT_D}/compiled"
     else
+        usage
         exit 1
     fi
 }
@@ -316,6 +317,9 @@ cmd_sv() {
             s6rc_list_up "${OPT_L}"
         elif [ "${2}" = "down" ]; then
             s6rc_list_down "${OPT_L}"
+        else
+            usage
+            exit 1
         fi
 
     elif [ "${1}" = "restart" ]; then
@@ -323,6 +327,9 @@ cmd_sv() {
         [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
 
         s6_restart_service "${OPT_S}" "${2}"
+    else
+        usage
+        exit 1
     fi
 }
 
