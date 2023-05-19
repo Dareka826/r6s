@@ -159,6 +159,7 @@ cmd_rc() {
 # Default options
 DRY_RUN="0"
 OPT_D=""
+OPT_E=""
 OPT_L=""
 OPT_S=""
 
@@ -175,6 +176,11 @@ while [ "${#}" -gt 0 ]; do
               shift 2
               ;;
 
+        "-e") [ "${#}" -ge 2 ] || exit 1
+              OPT_E="${2}"
+              shift 2
+              ;;
+
         "-l") [ "${#}" -ge 2 ] || exit 1
               OPT_L="${2}"
               shift 2
@@ -188,7 +194,6 @@ while [ "${#}" -gt 0 ]; do
            *) break ;;
     esac
 done
-
 
 # Check if any command specified
 [ "${#}" -gt 0 ] || { usage; exit 1; }

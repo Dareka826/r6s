@@ -1,4 +1,4 @@
-rs6 [ -n ] [ -s servicedir ] [ -l logfile ] init s6
+rs6 [ -n ] [ -s servicedir ] [ -l logfile ] [ -e envdir ] init s6
 
 rs6 [ -n ] [ -s servicedir ] [ -l livedir ] [ -d compiled_db ] init s6-rc
 
