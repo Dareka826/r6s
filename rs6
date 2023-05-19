@@ -146,21 +146,27 @@ var_gen_s6_logfile() {
 ## Commands {{{
 
 cmd_init() {
+    exit 1
 }
 
 cmd_compile_db() {
+    exit 1
 }
 
 cmd_switch_live_db() {
+    exit 1
 }
 
 cmd_update_db() {
+    exit 1
 }
 
 cmd_sv() {
+    exit 1
 }
 
 cmd_rc() {
+    exit 1
 }
 
 ## }}}
