@@ -69,7 +69,7 @@ s6rc_init() {
     execcmd "${S6_RC_INIT_BIN}" -c "${COMPILED_DB}" -l "${LIVE_DIR}" "${SVC_DIR}"
 }
 
-# Compile service dir to db
+# Compile service dir(s) to db
 s6rc_compile_db() {
     local DB_DIR="${1}"
     shift 1
