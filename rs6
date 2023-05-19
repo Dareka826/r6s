@@ -71,8 +71,11 @@ s6rc_init() {
 
 # Compile service dir to db
 s6rc_compile_db() {
-    local COMPILED_DB="${S6_RC_DB_DIR}/compiled-$("${S6_CLOCK_BIN}")"
-    execcmd "${S6_RC_COMPILE_BIN}" -v2 "${COMPILED_DB}" "${S6_RC_SV_DIR}"
+    local DB_DIR="${1}"
+    shift 1
+
+    execcmd "${S6_RC_COMPILE_BIN}" -v2 \
+        "${DB_DIR}/compiled-$("${S6_CLOCK_BIN}")" "${@}"
 }
 
 # Fetch name of newest db
@@ -178,7 +181,10 @@ cmd_init() {
 }
 
 cmd_compile_db() {
-    exit 1
+    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
+    [ -n "${*}" ] || { usage; exit 1; }
+
+    s6rc_compile_db "${OPT_D}" "$@"
 }
 
 cmd_switch_live_db() {
