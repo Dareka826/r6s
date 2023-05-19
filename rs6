@@ -6,7 +6,7 @@ iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
 
 # Ensure commands
 ALL_CMD_FOUND="1"
-for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-envuidgid s6-clock abduco; do
+for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock abduco; do
     iscmd "${CMD}" || {
         ALL_CMD_FOUND="0"
         printf "Command not found: %s\n" "${CMD}"
@@ -20,7 +20,6 @@ done
    S6_RC_INIT_BIN="$(cmdpath "s6-rc-init")"
 S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
  S6_RC_UPDATE_BIN="$(cmdpath "s6-rc-update")"
- S6_ENVUIDGID_BIN="$(cmdpath "s6-envuidgid")"
      S6_CLOCK_BIN="$(cmdpath "s6-clock")"
        ABDUCO_BIN="$(cmdpath "abduco")"
 
@@ -75,45 +74,31 @@ usage() {
     printf "    update_live_db\n"
 }
 
-# Default parameters
-USER="root"
-
-# Parse option args
-while [ "$#" -gt 0 ]; do
-    case "$1" in
-        "-u") [ "$#" -ge 2 ] || { usage; exit 1; }
-              USER="$2"
-              shift 2
-              ;;
-
-           *) break
-              ;;
-    esac
-done
-
 # Variables
-USER_UID="$("${S6_ENVUIDGID_BIN}" "${USER}" sh -c 'printf "%s\n" "${UID}"')"
+_USER="$(id -u -n)"
+ _UID="$(id -u)"
+_HOME="$(homeof "${_USER}")"
 
-if [ "${USER_UID}" = "0" ]; then
-    # Root user, global s6
-    S6_SERVICE_DIR="/var/service"
+if [ "${_UID}" = "0" ]; then
+    # Root user, global s6 installation
+    S6_SERVICE_DIR="/run/service"
+    S6_RC_LIVE_DIR="/run/s6-rc"
 
     # TODO: Multile SV dirs (like on Artix)
     S6_RC_SV_DIR="/etc/s6/sv"
-    S6_RC_DB_DIR="/etc/s6/rc/compiled"
+    S6_RC_DB_DIR="/etc/s6/rc"
     S6_RC_ENV_DIR=""
-    S6_RC_LIVE_DIR="/run/s6-rc"
 else
     # User-local s6
-    S6_SERVICE_DIR="/tmp/s6-service-${USER_UID}"
+    S6_SERVICE_DIR="/tmp/s6-service-${_UID}"
+    S6_RC_LIVE_DIR="/tmp/s6-rc-${_UID}"
 
-    S6_RC_SV_DIR="/home/${USER}/.local/share/s6/sv"
-    S6_RC_DB_DIR="/home/${USER}/.local/share/s6/rc"
-    S6_RC_ENV_DIR="/home/${USER}/.local/share/s6/env.d"
-    S6_RC_LIVE_DIR="/tmp/s6-rc-${USER_UID}"
+     S6_RC_SV_DIR="${_HOME}/.local/share/s6/sv"
+     S6_RC_DB_DIR="${_HOME}/.local/share/s6/rc"
+    S6_RC_ENV_DIR="${_HOME}/.local/share/s6/env.d"
 
-    XDG_RUNTIME_DIR="/run/user/${USER_UID}"
-    DBUS_SESSION_BUS_ADDRESS="unix:abstract=/${USER_UID}/dbus"
+    XDG_RUNTIME_DIR="/run/user/${_UID}"
+    DBUS_SESSION_BUS_ADDRESS="unix:abstract=/${_UID}/dbus"
 fi
 
 # Parse command args
