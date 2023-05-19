@@ -191,6 +191,7 @@ var_gen_s6_logfile() {
 
 cmd_init() {
     [ -n "${OPT_S}" ] || OPT_S="$(var_gen_s6_service_dir)"
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
 
     if [ "${1}" = "s6" ]; then
         [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_logfile)"
