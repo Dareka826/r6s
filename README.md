@@ -10,11 +10,12 @@ using this tool in case problems occur.
 rs6 [options] command
 
   options:
-    -n    dry run
+    -n                dry run
 
   commands:
-    init_s6
-    init_s6-rc
-    compile_db
-    update_live_db
+    init_s6           Runs s6-svscan in abduco
+    init_s6-rc        Initializes s6-rc state
+    compile_db        Compiles a new db from the service definitions
+    update_live_db    Updates the db that s6-rc is using to the newest one
+
 ```

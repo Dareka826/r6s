@@ -80,13 +80,13 @@ usage() {
     printf "%s [options] command\n" "${0}"
     printf "\n"
     printf "  options:\n"
-    printf "    -n    dry run\n"
+    printf "    -n                dry run\n"
     printf "\n"
     printf "  commands:\n"
-    printf "    init_s6\n"
-    printf "    init_s6-rc\n"
-    printf "    compile_db\n"
-    printf "    update_live_db\n"
+    printf "    init_s6           Runs s6-svscan in abduco\n"
+    printf "    init_s6-rc        Initializes s6-rc state\n"
+    printf "    compile_db        Compiles a new db from the service definitions\n"
+    printf "    update_live_db    Updates the db that s6-rc is using to the newest one\n"
 }
 
 ## Variables {{{
