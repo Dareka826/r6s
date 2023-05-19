@@ -1,7 +1,8 @@
 #!/bin/sh
 set -eu
 
-iscmd() { command -v "${1}" >/dev/null 2>&1; }
+cmdpath() { command -v "${1}"; }
+iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
 
 # Ensure commands
 ALL_CMD_FOUND="1"
@@ -12,6 +13,16 @@ for CMD in s6-svscan s6-rc s6-rc-init s6-rc-compile abduco; do
     }
 done
 [ "${ALL_CMD_FOUND}" = "1" ] || exit 1
+
+# Get absolute command paths (in case of local installation / idk if needed)
+    S6_SVSCAN_BIN="$(cmdpath "s6-svscan")"
+    S6_ENVDIR_BIN="$(cmdpath "s6-envdir")"
+   S6_RC_INIT_BIN="$(cmdpath "s6-rc-init")"
+S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
+ S6_RC_UPDATE_BIN="$(cmdpath "s6-rc-update")"
+ S6_ENVUIDGID_BIN="$(cmdpath "s6-envuidgid")"
+       ABDUCO_BIN="$(cmdpath "abduco")"
+
 
 dump_vars() {
     printf "USER: %s\n" "${USER}"
@@ -30,21 +41,21 @@ s6_init() {
     # Ensure service dir
     install -d -o "${USER}" -g "${USER}" -m 750 "${S6_SERVICE_DIR}"
 
-    abduco | grep s6-svscan >/dev/null 2>&1 || \
-        abduco -n s6-svscan \
-            s6-envdir -I "${S6_RC_ENV_DIR}" \
-                s6-svscan "${S6_SERVICE_DIR}"
+    "${ABDUCO_BIN}" | grep s6-svscan >/dev/null 2>&1 || \
+        "${ABDUCO_BIN}" -n s6-svscan \
+            "${S6_ENVDIR_BIN}" -I "${S6_RC_ENV_DIR}" \
+                "${S6_SVSCAN_BIN}" "${S6_SERVICE_DIR}"
 }
 
 # Initialize s6-rc state
 s6rc_init() {
-    s6-rc-init -c "${S6_RC_BD_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
+    "${S6_RC_INIT_BIN}" -c "${S6_RC_BD_DIR}/compiled" -l "${S6_RC_LIVE_DIR}" "${S6_SERVICE_DIR}"
 }
 
 # Compile service dir to db
 s6rc_compile_db() {
     local COMPILED_DB="${S6_RC_DB_DIR}/compiled-$(s6-clock)"
-    s6-rc-compile -v2 "${COMPILED_DB}" "${S6_RC_SV_DIR}"
+    "${S6_RC_COMPILE_BIN}" -v2 "${COMPILED_DB}" "${S6_RC_SV_DIR}"
 }
 
 # Fetch name of newest db
@@ -56,7 +67,7 @@ s6rc_newest_db() {
 # Update live db to the newest one
 s6rc_update_live_db() {
     local NEW_DB="$(s6rc_newest_db)"
-    s6-rc-update -v2 -l "${S6_RC_LIVE_DIR}" "${NEW_DB}"
+    "${S6_RC_UPDATE_BIN}" -v2 -l "${S6_RC_LIVE_DIR}" "${NEW_DB}"
 
     # Atomic symlink update
     ln -sf "${NEW_DB##*/}" "${S6_RC_DB_DIR}/compiled/compiled"
@@ -94,7 +105,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Variables
-USER_UID="$(s6-envuidgid "${USER}" sh -c 'printf "%s\n" "${UID}"')"
+USER_UID="$("${S6_ENVUIDGID_BIN}" "${USER}" sh -c 'printf "%s\n" "${UID}"')"
 
 if [ "${USER_UID}" = "0" ]; then
     # Root user, global s6
