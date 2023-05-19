@@ -41,10 +41,12 @@ s6_init() {
     # Ensure service dir
     execcmd install -d -o "${USER}" -g "${USER}" -m 750 "${S6_SERVICE_DIR}"
 
-    "${ABDUCO_BIN}" | grep s6-svscan >/dev/null 2>&1 || \
+    # Run s6-svscan in abduco if not already running
+    if ! { "${ABDUCO_BIN}" | tail +2 | sed 's/.*\t//' | grep "^s6-svscan$" >/dev/null 2>&1; }; then
         execcmd "${ABDUCO_BIN}" -n s6-svscan \
             "${S6_ENVDIR_BIN}" -I "${S6_RC_ENV_DIR}" \
                 "${S6_SVSCAN_BIN}" "${S6_SERVICE_DIR}"
+    fi
 }
 
 # Initialize s6-rc state
