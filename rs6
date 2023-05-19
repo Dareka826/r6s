@@ -130,9 +130,9 @@ while [ "${#}" -gt 0 ]; do
 done
 
 # Parse command args
-[ "$#" -gt 0 ] || { usage; exit 0; }
-while [ "$#" -gt 0 ]; do
-    case "$1" in
+[ "${#}" -gt 0 ] || { usage; exit 0; }
+while [ "${#}" -gt 0 ]; do
+    case "${1}" in
                "init_s6") s6_init ; shift 1 ;;
             "init_s6-rc") s6rc_init ; shift 1 ;;
             "compile_db") s6rc_compile_db ; shift 1 ;;
