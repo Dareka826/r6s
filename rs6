@@ -1,6 +1,55 @@
 #!/bin/sh
 set -eu
 
+## Usage {{{
+usage() {
+    printf "%s [options] command [command_args...]\n" "${0}"
+    printf "\n"
+    printf "  commands:\n"
+    printf "    init s6                          Run s6-svscan\n"
+    printf "    init s6-rc                       Initialize s6-rc live state\n"
+    printf "    compile_db SERVICE_DEF_DIR...    Compile a s6-rc database from definitions\n"
+    printf "    switch_live_db NEW_DB            Switch which database an s6-rc instance is using\n"
+    printf "    change_default_db NEW_DB         Change which database is used for initialization\n"
+    printf "    sv list up                       List active services\n"
+    printf "    sv list down                     List inactive services\n"
+    printf "    sv restart SERVICE               Restart a service\n"
+    printf "    rc AGRS...                       Run s6-rc with provided args\n"
+    printf "\n"
+    printf "  options:\n"
+    printf "    -n        Dry run (print commands instead of executing them)\n"
+    printf "\n"
+    printf "    init s6:\n"
+    printf "      -s SERVICE_DIR        s6-svscan service directory\n"
+    printf "      -l LOG_FILE           file to save s6-svscan logs to\n"
+    printf "      -e ENV_DIR            envdir for s6-svscan's environment\n"
+    printf "\n"
+    printf "    init s6-rc:\n"
+    printf "      -s SERVICE_DIR        s6-svscan service directory\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "      -d DB_DIR             s6-rc database directory\n"
+    printf "\n"
+    printf "    compile_db:\n"
+    printf "      -d DB_DIR             s6-rc database directory\n"
+    printf "\n"
+    printf "    switch_live_db:\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+    printf "    change_default_db:\n"
+    printf "      -d DB_DIR             s6-rc database directory\n"
+    printf "\n"
+    printf "    sv list:\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+    printf "    sv restart:\n"
+    printf "      -s SERVICE_DIR        s6-svscan service directory\n"
+    printf "\n"
+    printf "    rc:\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+}
+## }}}
+
 ## Utilities {{{
 cmdpath() { command -v "${1}"; }
 iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
@@ -135,21 +184,6 @@ s6rc_passthrough() {
     shift 1
 
     execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" "${@}"
-}
-
-usage() {
-    printf "%s [options] command\n" "${0}"
-    printf "\n"
-    printf "  options:\n"
-    printf "    -n                dry run\n"
-    printf "\n"
-    printf "  commands:\n"
-    printf "    init_s6           Runs s6-svscan in abduco\n"
-    printf "    init_s6-rc        Initializes s6-rc state\n"
-    printf "    compile_db        Compiles a new db from the service definitions\n"
-    printf "    update_live_db    Updates the db that s6-rc is using to the newest one\n"
-    printf "    svc_list_up       List active services\n"
-    printf "    svc_list_down     List inactive services\n"
 }
 
 ## Variables {{{
