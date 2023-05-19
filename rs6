@@ -23,19 +23,6 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
  S6_ENVUIDGID_BIN="$(cmdpath "s6-envuidgid")"
        ABDUCO_BIN="$(cmdpath "abduco")"
 
-
-dump_vars() {
-    printf "USER: %s\n" "${USER}"
-    printf "USER_UID: %s\n" "${USER_UID}"
-
-    printf "S6_SERVICE_DIR: %s\n" "${S6_SERVICE_DIR}"
-
-    printf "S6_RC_SV_DIR: %s\n" "${S6_RC_SV_DIR}"
-    printf "S6_RC_DB_DIR: %s\n" "${S6_RC_DB_DIR}"
-    printf "S6_RC_ENV_DIR: %s\n" "${S6_RC_ENV_DIR}"
-    printf "S6_RC_LIVE_DIR: %s\n" "${S6_RC_LIVE_DIR}"
-}
-
 # Run svscan on service dir
 s6_init() {
     # Ensure service dir
@@ -85,7 +72,6 @@ usage() {
     printf "    init_s6-rc\n"
     printf "    compile_db\n"
     printf "    update_live_db\n"
-    printf "    dump_vars\n"
 }
 
 # Default parameters
@@ -137,7 +123,6 @@ while [ "$#" -gt 0 ]; do
             "init_s6-rc") s6rc_init ; shift 1 ;;
             "compile_db") s6rc_compile_db ; shift 1 ;;
         "update_live_db") s6rc_update_live_db ; shift 1 ;;
-             "dump_vars") dump_vars ; shift 1 ;;
                        *) usage ; exit 0 ;;
     esac
 done
