@@ -130,6 +130,13 @@ s6_restart_service() {
     execcmd "${S6_SVC_BIN}" -r "${SVC_DIR}/${SVC_NAME}"
 }
 
+s6rc_passthrough() {
+    local LIVE_DIR="${1}"
+    shift 1
+
+    execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" "${@}"
+}
+
 usage() {
     printf "%s [options] command\n" "${0}"
     printf "\n"
@@ -252,7 +259,10 @@ cmd_sv() {
 }
 
 cmd_rc() {
-    exit 1
+    [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
+
+    s6rc_passthrough "${OPT_L}" "${@}"
 }
 
 ## }}}
