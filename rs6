@@ -6,7 +6,7 @@ iscmd()   { cmdpath "${1}" >/dev/null 2>&1; }
 
 # Ensure commands
 ALL_CMD_FOUND="1"
-for CMD in s6-svscan s6-rc s6-rc-init s6-rc-compile abduco; do
+for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-envuidgid s6-clock abduco; do
     iscmd "${CMD}" || {
         ALL_CMD_FOUND="0"
         printf "Command not found: %s\n" "${CMD}"
@@ -21,6 +21,7 @@ done
 S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
  S6_RC_UPDATE_BIN="$(cmdpath "s6-rc-update")"
  S6_ENVUIDGID_BIN="$(cmdpath "s6-envuidgid")"
+     S6_CLOCK_BIN="$(cmdpath "s6-clock")"
        ABDUCO_BIN="$(cmdpath "abduco")"
 
 # Run svscan on service dir
@@ -41,7 +42,7 @@ s6rc_init() {
 
 # Compile service dir to db
 s6rc_compile_db() {
-    local COMPILED_DB="${S6_RC_DB_DIR}/compiled-$(s6-clock)"
+    local COMPILED_DB="${S6_RC_DB_DIR}/compiled-$("${S6_CLOCK_BIN}")"
     "${S6_RC_COMPILE_BIN}" -v2 "${COMPILED_DB}" "${S6_RC_SV_DIR}"
 }
 
