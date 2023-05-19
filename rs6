@@ -87,10 +87,21 @@ s6rc_switch_live_db() {
     execcmd "${S6_RC_UPDATE_BIN}" -v2 -l "${LIVE_DIR}" "${NEW_DB}"
 }
 
-s6_rc_update_db() {
-    # Atomic symlink update
-    execcmd ln -sf "${NEW_DB##*/}" "${S6_RC_DB_DIR}/compiled/compiled"
-    execcmd mv -f "${S6_RC_DB_DIR}/compiled/compiled" "${S6_RC_DB_DIR}/"
+s6rc_change_default_db() {
+    local DB_DIR="${1}"
+    local NEW_DB="${2}"
+    shift 2
+
+    if [ -e "${DB_DIR}/compiled" ]; then
+        [ -h "${DB_DIR}/compiled" ] || \
+            { printf "[E]: %s/compiled is not a symlink!" "${DB_DIR}"; exit 1; }
+
+        # Atomic symlink update
+        execcmd ln -sf "${NEW_DB}" "${DB_DIR}/compiled/compiled"
+        execcmd mv -f "${DB_DIR}/compiled/compiled" "${DB_DIR}/"
+    else
+        execcmd ln -sf "${NEW_DB}" "${DB_DIR}/compiled"
+    fi
 }
 
 s6rc_list_up() {
@@ -193,8 +204,11 @@ cmd_switch_live_db() {
     s6rc_switch_live_db "${OPT_L}" "${1}"
 }
 
-cmd_update_db() {
-    exit 1
+cmd_change_default_db() {
+    [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
+    [ "${#}" -ge 1 ] || { usage; exit 1; }
+
+    s6rc_change_default_db "${OPT_D}" "${1}"
 }
 
 cmd_sv() {

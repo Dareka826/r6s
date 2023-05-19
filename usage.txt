@@ -6,7 +6,7 @@ rs6 [ -n ] [ -d db_dir ] compile_db SERVICE_DEF_DIR...
 
 rs6 [ -n ] [ -l livedir ] switch_live_db COMPILED_NEW_DB
 
-rs6 [ -n ] [ -l livedir ] [ -d db_dir ] update_db COMPILED_NEW_DB
+rs6 [ -n ] [ -d db_dir ] change_default_db COMPILED_NEW_DB
 
 rs6 [ -n ] [ -l livedir ] sv list up
 rs6 [ -n ] [ -l livedir ] sv list down
