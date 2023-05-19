@@ -276,9 +276,9 @@ cmd_init() {
         s6_init "${OPT_S}" "${OPT_L}" "${OPT_E}"
     elif [ "${1}" = "s6-rc" ]; then
         [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
-        [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)/compiled"
+        [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
 
-        s6rc_init "${OPT_S}" "${OPT_L}" "${OPT_D}"
+        s6rc_init "${OPT_S}" "${OPT_L}" "${OPT_D}/compiled"
     else
         exit 1
     fi
