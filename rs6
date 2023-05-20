@@ -299,7 +299,7 @@ var_gen_s6_rc_db_dir() {
 var_gen_s6_logfile() {
     [ "${_UID}" = "0" ] \
         && printf "%s" "/var/log/s6.log" \
-        || printf "%s" "/tmp/s6-${_UID}.log"
+        || printf "%s" "${_TMPDIR}/s6-${_UID}.log"
 }
 ## }}}
 
