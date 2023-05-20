@@ -21,6 +21,8 @@ using this tool in case problems occur.
     rc AGRS...                       Run s6-rc with provided args
     env add VAR VALUE                Add variable to envdir
     env del VAR                      Remove variable from envdir
+    env list                         List virables defined in envdir
+    env get VAR                      Print value of variable from envdir
 
   options:
     -n        Dry run (print commands instead of executing them)
