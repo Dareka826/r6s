@@ -15,6 +15,7 @@ using this tool in case problems occur.
     compile_db SERVICE_DEF_DIR...    Compile a s6-rc database from definitions
     switch_live_db NEW_DB            Switch which database an s6-rc instance is using
     change_default_db NEW_DB         Change which database is used for initialization
+    upgrade_db SERVICE_DEF_DIR...    Compile db, switch and change default
     sv list up                       List active services
     sv list down                     List inactive services
     sv restart SERVICE               Restart a service
@@ -45,6 +46,10 @@ using this tool in case problems occur.
 
     change_default_db:
       -d DB_DIR             s6-rc database directory
+
+    upgrade_db
+      -d DB_DIR             s6-rc database directory
+      -l LIVE_DIR           s6-rc live directory
 
     sv list:
       -l LIVE_DIR           s6-rc live directory
