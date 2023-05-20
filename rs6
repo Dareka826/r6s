@@ -25,6 +25,7 @@ usage() {
     printf "\n"
     printf "  switches:\n"
     printf "    -n        Dry run (print commands instead of executing them)\n"
+    printf "    -a        No abduco (exec instead for user management)\n"
     printf "\n"
     printf "  options:\n"
     printf "    -d  DB_DIR:         s6-rc database directory\n"
@@ -73,7 +74,7 @@ execcmd() {
 ## Preparation {{{
 # Ensure commands
 ALL_CMD_FOUND="1"
-for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock s6-rc s6-svc abduco; do
+for CMD in s6-svscan s6-envdir s6-rc-init s6-rc-compile s6-rc-update s6-clock s6-rc s6-svc; do
     iscmd "${CMD}" || {
         ALL_CMD_FOUND="0"
         printf "Command not found: %s\n" "${CMD}"
@@ -90,7 +91,6 @@ S6_RC_COMPILE_BIN="$(cmdpath "s6-rc-compile")"
      S6_CLOCK_BIN="$(cmdpath "s6-clock")"
         S6_RC_BIN="$(cmdpath "s6-rc")"
        S6_SVC_BIN="$(cmdpath "s6-svc")"
-       ABDUCO_BIN="$(cmdpath "abduco")"
 ## }}}
 
 ## s6/s6-rc functions {{{
@@ -99,20 +99,31 @@ s6_init() {
     local SVC_DIR="${1}"
     local LOGFILE="${2}"
     local ENV_DIR="${3}"
-    shift 3
+    local NO_ABDUCO="${4}"
+    shift 4
 
     # Ensure service dir
     execcmd install -d -o "${USER}" -g "${USER}" -m 750 "${SVC_DIR}"
 
-    # Run s6-svscan in abduco if not already running
-    if ! { "${ABDUCO_BIN}" | tail +2 | sed 's/.*\t//' | grep "^s6-svscan$" >/dev/null 2>&1; }; then
-        execcmd "${ABDUCO_BIN}" -n "s6-svscan" \
-            sh -c '"${1}" -I "${2}" "${3}" "${4}" 2>&1 | tee "${5}"' '' \
+    if [ "${NO_ABDUCO}" = "0" ]; then
+        # Run s6-svscan in abduco if not already running
+        iscmd "abduco" || { printf "Command not found: abduco\n"; exit 1; }
+        ABDUCO_BIN="$(cmdpath "abduco")"
+
+        if ! { "${ABDUCO_BIN}" | tail +2 | sed 's/.*\t//' | grep "^s6-svscan$" >/dev/null 2>&1; }; then
+            execcmd "${ABDUCO_BIN}" -n "s6-svscan" \
+                sh -c '"${1}" -I "${2}" "${3}" "${4}" 2>&1 | tee "${5}"' '' \
+                "${S6_ENVDIR_BIN}" "${ENV_DIR}" \
+                "${S6_SVSCAN_BIN}" "${SVC_DIR}" \
+                "${LOGFILE}"
+        else
+            printf "[I]: s6-svscan is already running!\n"
+        fi
+    else
+        execcmd exec sh -c '"${1}" -I "${2}" "${3}" "${4}" 2>&1 | tee "${5}"' '' \
             "${S6_ENVDIR_BIN}" "${ENV_DIR}" \
             "${S6_SVSCAN_BIN}" "${SVC_DIR}" \
             "${LOGFILE}"
-    else
-        printf "[I]: s6-svscan is already running!\n"
     fi
 }
 
@@ -313,7 +324,7 @@ cmd_init() {
         [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_logfile)"
         [ -n "${OPT_E}" ] || OPT_E="$(var_gen_s6_env_dir)"
 
-        s6_init "${OPT_S}" "${OPT_L}" "${OPT_E}"
+        s6_init "${OPT_S}" "${OPT_L}" "${OPT_E}" "${SWC_A}"
     elif [ "${1}" = "s6-rc" ]; then
         [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
         [ -n "${OPT_D}" ] || OPT_D="$(var_gen_s6_rc_db_dir)"
