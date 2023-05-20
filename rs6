@@ -441,8 +441,11 @@ cmd_env() {
 # Check if any args present
 [ "${#}" -gt 0 ] || { usage; exit 0; }
 
+# Switches
+SWC_N="0"
+SWC_A="0"
+
 # Default options
-DRY_RUN="0"
 OPT_D=""
 OPT_E=""
 OPT_L=""
@@ -452,10 +455,16 @@ OPT_S=""
 while [ "${#}" -gt 0 ]; do
     case "${1}" in
 
-        "-n") DRY_RUN="1"
+        # Switches
+        "-n") SWC_N="1"
               shift 1
               ;;
 
+        "-a") SWC_A="1"
+              shift 1
+              ;;
+
+        # Options
         "-d") [ "${#}" -ge 2 ] || exit 1
               OPT_D="${2}"
               shift 2
@@ -479,6 +488,8 @@ while [ "${#}" -gt 0 ]; do
            *) break ;;
     esac
 done
+
+DRY_RUN="${SWC_N}"
 
 # Check if any command specified
 [ "${#}" -gt 0 ] || { usage; exit 1; }
