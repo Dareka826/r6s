@@ -63,3 +63,11 @@ using this tool in case problems occur.
     env:
       -e ENV_DIR            envdir to change
 ```
+
+# Design choices
+
+## Why is s6-svscan running in abduco?
+
+This tool was made primarily for me to administer per-user s6 + s6-rc trees.
+Using abduco for the svscan process allows the daemons to persist even when the
+user logs out.
