@@ -17,6 +17,8 @@ usage() {
     printf "    rc AGRS...                       Run s6-rc with provided args\n"
     printf "    env add VAR VALUE                Add variable to envdir\n"
     printf "    env del VAR                      Remove variable from envdir\n"
+    printf "    env list                         List virables defined in envdir\n"
+    printf "    env get VAR                      Print value of variable from envdir\n"
     printf "\n"
     printf "  options:\n"
     printf "    -n        Dry run (print commands instead of executing them)\n"
@@ -218,6 +220,27 @@ s6_env_del() {
 
     execcmd rm "${ENV_DIR}/${VAR}"
 }
+
+s6_env_list() {
+    local ENV_DIR="${1}"
+    shift 1
+
+    [ -d "${ENV_DIR}" ] || \
+        { printf "[E]: Environment directory doesn't exist!: %s\n" "${ENV_DIR}"; exit 1; }
+
+    execcmd ls -1 "${ENV_DIR}"
+}
+
+s6_env_get() {
+    local ENV_DIR="${1}"
+    local VAR="${2}"
+    shift 2
+
+    [ -d "${ENV_DIR}" ] || \
+        { printf "[E]: Environment directory doesn't exist!: %s\n" "${ENV_DIR}"; exit 1; }
+
+    execcmd cat "${ENV_DIR}/${VAR}"
+}
 ## }}}
 
 ## Variables {{{
@@ -352,6 +375,16 @@ cmd_env() {
         [ "${#}" -ge 2 ] || { usage; exit 1; }
 
         s6_env_del "${OPT_E}" "${2}"
+    elif [ "${1}" = "list" ]; then
+
+        s6_env_list "${OPT_E}"
+    elif [ "${1}" = "get" ]; then
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+
+        s6_env_get "${OPT_E}" "${2}"
+    else
+        usage
+        exit 1
     fi
 }
 
