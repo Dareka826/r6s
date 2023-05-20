@@ -29,6 +29,7 @@ using this tool in case problems occur.
 
   switches:
     -n        Dry run (print commands instead of executing them)
+    -a        No abduco (exec instead for user management)
 
   options:
     -d  DB_DIR:         s6-rc database directory
