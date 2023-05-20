@@ -132,8 +132,10 @@ s6rc_compile_db() {
     local DB_DIR="${1}"
     shift 1
 
-    execcmd "${S6_RC_COMPILE_BIN}" \
-        "${DB_DIR}/compiled-$("${S6_CLOCK_BIN}")" "${@}"
+    local NEW_DB="${DB_DIR}/compiled-$("${S6_CLOCK_BIN}")"
+    printf "%s\n" "${NEW_DB}"
+
+    execcmd "${S6_RC_COMPILE_BIN}" "${NEW_DB}" "${@}"
 }
 
 # Switch which db s6-rc is using
