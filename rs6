@@ -132,7 +132,7 @@ s6rc_compile_db() {
     local DB_DIR="${1}"
     shift 1
 
-    execcmd "${S6_RC_COMPILE_BIN}" -v2 \
+    execcmd "${S6_RC_COMPILE_BIN}" \
         "${DB_DIR}/compiled-$("${S6_CLOCK_BIN}")" "${@}"
 }
 
@@ -142,7 +142,7 @@ s6rc_switch_live_db() {
     local NEW_DB="${2}"
     shift 2
 
-    execcmd "${S6_RC_UPDATE_BIN}" -v2 -l "${LIVE_DIR}" "${NEW_DB}"
+    execcmd "${S6_RC_UPDATE_BIN}" -l "${LIVE_DIR}" "${NEW_DB}"
 }
 
 s6rc_change_default_db() {
