@@ -269,13 +269,13 @@ _TMPDIR="${TMPDIR:-/tmp}"
 var_gen_s6_service_dir() {
     [ "${_UID}" = "0" ] \
         && printf "%s" "/run/service" \
-        || printf "%s" "${_TMPDIR}/s6-service-${_UID}"
+        || printf "%s" "${_TMPDIR}/${_UID}/service"
 }
 
 var_gen_s6_rc_live_dir() {
     [ "${_UID}" = "0" ] \
         && printf "%s" "/run/s6-rc" \
-        || printf "%s" "${_TMPDIR}/s6-rc-${_UID}"
+        || printf "%s" "${_TMPDIR}/${_UID}/s6-rc"
 }
 
 var_gen_s6_env_dir() {
@@ -299,7 +299,7 @@ var_gen_s6_rc_db_dir() {
 var_gen_s6_logfile() {
     [ "${_UID}" = "0" ] \
         && printf "%s" "/var/log/s6.log" \
-        || printf "%s" "${_TMPDIR}/s6-${_UID}.log"
+        || printf "%s" "${_TMPDIR}/${_UID}/s6-svscan.log"
 }
 ## }}}
 
