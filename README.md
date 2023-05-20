@@ -7,7 +7,7 @@ using this tool in case problems occur.
 # Usage
 
 ```
-./rs6 [options] command [command_args...]
+./rs6 [switches | options] command [command_args...]
 
   commands:
     init s6                          Run s6-svscan
@@ -18,6 +18,8 @@ using this tool in case problems occur.
     upgrade_db SERVICE_DEF_DIR...    Compile db, switch and change default
     sv list up                       List active services
     sv list down                     List inactive services
+    sv start SERVICE                 Start a service
+    sv stop SERVICE                  Stop a service
     sv restart SERVICE               Restart a service
     rc AGRS...                       Run s6-rc with provided args
     env add VAR VALUE                Add variable to envdir
@@ -25,43 +27,35 @@ using this tool in case problems occur.
     env list                         List virables defined in envdir
     env get VAR                      Print value of variable from envdir
 
-  options:
+  switches:
     -n        Dry run (print commands instead of executing them)
 
-    init s6:
-      -s SERVICE_DIR        s6-svscan service directory
-      -l LOG_FILE           file to save s6-svscan logs to
-      -e ENV_DIR            envdir for s6-svscan's environment
+  options:
+    -d  DB_DIR:         s6-rc database directory
+          init s6-rc
+          compile_db
+          change_default_db
+          upgrade_db
 
-    init s6-rc:
-      -s SERVICE_DIR        s6-svscan service directory
-      -l LIVE_DIR           s6-rc live directory
-      -d DB_DIR             s6-rc database directory
+    -e  ENV_DIR:        s6-envdir environment directory
+          init s6
+          env
 
-    compile_db:
-      -d DB_DIR             s6-rc database directory
+    -l  LIVE_DIR:       s6-rc live state directory
+          init s6-rc
+          switch_live_db
+          upgrade_db
+          sv list
+          sv start
+          sv stop
+          rc
+        LOG_FILE:       file to save s6-svscan logs to
+          init s6
 
-    switch_live_db:
-      -l LIVE_DIR           s6-rc live directory
-
-    change_default_db:
-      -d DB_DIR             s6-rc database directory
-
-    upgrade_db
-      -d DB_DIR             s6-rc database directory
-      -l LIVE_DIR           s6-rc live directory
-
-    sv list:
-      -l LIVE_DIR           s6-rc live directory
-
-    sv restart:
-      -s SERVICE_DIR        s6-svscan service directory
-
-    rc:
-      -l LIVE_DIR           s6-rc live directory
-
-    env:
-      -e ENV_DIR            envdir to change
+    -s  SERVICE_DIR:    s6-svscan service directory
+          init s6
+          init s6-rc
+          sv restart
 ```
 
 # Design choices
