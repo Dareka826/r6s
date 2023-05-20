@@ -14,6 +14,8 @@ usage() {
     printf "    upgrade_db SERVICE_DEF_DIR...    Compile db, switch and change default\n"
     printf "    sv list up                       List active services\n"
     printf "    sv list down                     List inactive services\n"
+    printf "    sv start SERVICE                 Start a service\n"
+    printf "    sv stop SERVICE                  Stop a service\n"
     printf "    sv restart SERVICE               Restart a service\n"
     printf "    rc AGRS...                       Run s6-rc with provided args\n"
     printf "    env add VAR VALUE                Add variable to envdir\n"
@@ -48,6 +50,12 @@ usage() {
     printf "      -l LIVE_DIR           s6-rc live directory\n"
     printf "\n"
     printf "    sv list:\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+    printf "    sv start:\n"
+    printf "      -l LIVE_DIR           s6-rc live directory\n"
+    printf "\n"
+    printf "    sv stop:\n"
     printf "      -l LIVE_DIR           s6-rc live directory\n"
     printf "\n"
     printf "    sv restart:\n"
@@ -181,6 +189,22 @@ s6rc_list_down() {
     shift 1
 
     execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" -ad list
+}
+
+s6_start_service() {
+    local LIVE_DIR="${1}"
+    local SVC_NAME="${2}"
+    shift 2
+
+    execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" -u change "${SVC_NAME}"
+}
+
+s6_stop_service() {
+    local LIVE_DIR="${1}"
+    local SVC_NAME="${2}"
+    shift 2
+
+    execcmd "${S6_RC_BIN}" -l "${LIVE_DIR}" -d change "${SVC_NAME}"
 }
 
 s6_restart_service() {
@@ -368,6 +392,18 @@ cmd_sv() {
             usage
             exit 1
         fi
+
+    elif [ "${1}" = "start" ]; then
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+
+        s6_start_service "${OPT_L}" "${2}"
+
+    elif [ "${1}" = "stop" ]; then
+        [ "${#}" -ge 2 ] || { usage; exit 1; }
+        [ -n "${OPT_L}" ] || OPT_L="$(var_gen_s6_rc_live_dir)"
+
+        s6_stop_service "${OPT_L}" "${2}"
 
     elif [ "${1}" = "restart" ]; then
         [ "${#}" -ge 2 ] || { usage; exit 1; }
