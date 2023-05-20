@@ -1,4 +1,4 @@
-# Rin's s6-rc management tool
+# Rin's s6 management tool
 
 A tool I wrote to make using s6 and s6-rc easier (especially for user installations).
 If you're not familiar with how s6 and s6-rc work, then I'd recommend not
